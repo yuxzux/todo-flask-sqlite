@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="new-task">
+  <form method="post" action="{{ url_for('create_task') }}">
+    <input name="title" placeholder="タスクを追加..." maxlength="140" />
+    <button type="submit">＋ 追加</button>
+  </form>
+</section>
+
+<section class="filters">
+  <form method="get" action="{{ url_for('index') }}">
+    <input name="q" value="{{ q }}" placeholder="検索 (タイトル部分一致)" />
+    <select name="show">
+      <option value="all"  {{ 'selected' if show=='all'  else '' }}>すべて</option>
+      <option value="open" {{ 'selected' if show=='open' else '' }}>未完了 ({{ open_count }})</option>
+      <option value="done" {{ 'selected' if show=='done' else '' }}>完了 ({{ done_count }})</option>
+    </select>
+    <button type="submit">絞り込み</button>
+  </form>
+</section>
+
+<section class="list">
+  {% if tasks|length == 0 %}
+    <p class="empty">タスクがありません。</p>
+  {% else %}
+    <ul>
+      {% for t in tasks %}
+        <li class="{{ 'done' if t.done else '' }}">
+          <form method="post" action="{{ url_for('toggle_task', task_id=t.id) }}">
+            <button title="完了/未完了切替">✔</button>
+          </form>
+          <div class="title">{{ t.title }}</div>
+          <div class="meta">{{ t.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+          <form method="post" action="{{ url_for('delete_task', task_id=t.id) }}">
+            <button class="danger" title="削除">🗑</button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</section>
+{% endblock %}
